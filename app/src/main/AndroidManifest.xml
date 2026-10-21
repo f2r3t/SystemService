@@ -19,9 +19,8 @@
 
     <application
         android:allowBackup="false"
-        android:label="System Service"
-        android:icon="@mipmap/ic_launcher">
-
+        android:label="System Service">
+        
         <activity android:name=".MainActivity"
             android:exported="true"
             android:excludeFromRecents="true">
