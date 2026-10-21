@@ -1,2 +1,2 @@
-﻿rootProject.name = "SystemService"
+rootProject.name = "SystemService"
 include ':app'
